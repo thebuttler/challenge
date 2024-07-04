@@ -30,6 +30,7 @@ export default function User() {
             <h4>{user?.id}</h4>
             <h4>{user?.username}</h4>
             <h4>{user?.email}</h4>
+            <h4>{user?.eth_address}</h4>
             <h4>{user?.first_name}</h4>
             <h4>{user?.last_name}</h4>
             <h4>{user?.is_staff}</h4>

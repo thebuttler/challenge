@@ -3,7 +3,7 @@ from django.conf import settings
 from django.middleware import csrf
 from rest_framework import exceptions as rest_exceptions, response, decorators as rest_decorators, permissions as rest_permissions
 from rest_framework_simplejwt import tokens, views as jwt_views, serializers as jwt_serializers, exceptions as jwt_exceptions
-from user import serializers, models
+from user import serializers, models, fetch_balance
 
 
 def get_user_tokens(user):
@@ -46,6 +46,7 @@ def loginView(request):
             samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
         )
 
+        # Include the eth balance in the response data
         res.data = tokens
         res["X-CSRFToken"] = csrf.get_token(request)
         return res
@@ -125,6 +126,12 @@ def user(request):
         user = models.User.objects.get(id=request.user.id)
     except models.User.DoesNotExist:
         return response.Response(status_code=404)
+    
+    eth_balance = fetch_balance.get_eth_balance(user.eth_address)
+    print(f"balance: {eth_balance}")
 
     serializer = serializers.UserSerializer(user)
-    return response.Response(serializer.data)
+    data = serializer.data
+    data["eth_balance"] = eth_balance
+
+    return response.Response(data)

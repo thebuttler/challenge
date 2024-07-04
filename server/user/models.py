@@ -9,13 +9,15 @@ import base64, requests, subprocess
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, password=None, **kwargs):
+    def create_user(self, email, password=None, eth_address='0x', **kwargs):
 
         if not email:
             raise ValueError("Email is required")
 
+        # Adding the eth address has a parameter, when user is created the new field will be stored in the database - Ronald Arevalo
         user = self.model(
-            email=self.normalize_email(email)
+            email=self.normalize_email(email),
+            eth_address=eth_address,
         )
 
         user.set_password(password)
@@ -43,6 +45,7 @@ class User(AbstractBaseUser):
     email = models.EmailField(null=False, blank=False, unique=True)
     first_name = models.CharField(max_length=50, blank=False, null=False, default='Default first name')
     last_name = models.CharField(max_length=50, blank=False, null=False, default='Default last name')
+    eth_address = models.CharField(max_length=42, blank=True, null=True, default='0x')
     is_admin = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
